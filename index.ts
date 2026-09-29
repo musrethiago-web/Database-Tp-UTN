@@ -26,7 +26,32 @@ async function main() {
         const coleccion = db.collection<Libro>(collectionName);
 
         switch (accion) {
+            case 'create': {
+                const [_, titulo, autor, precioStr, stockStr] = args;
 
+                if (!titulo || !autor || !precioStr || !stockStr) {
+                    console.log('Error: Faltan argumentos. Uso: npx tsx index.ts create <titulo> <autor> <precio> <stock>');
+                    break;
+                }
+
+                const nuevoLibro: Libro = {
+                    titulo,
+                    autor,
+                    precio: Number(precioStr),
+                    stock: Number(stockStr)
+                };
+
+                const resultado = await coleccion.insertOne(nuevoLibro);
+                console.log(`Libro guardado con éxito. ID: ${resultado.insertedId}`);
+                break;
+            }
+            case 'read': {
+
+                const libros = await coleccion.find({}).toArray();
+                console.log('\n--- Lista de Libros en la Biblioteca ---');
+                console.table(libros);
+                break;
+            }
 
             default:
                 console.log('Comando no reconocido. Opciones válidas: create, read, update, delete.');
