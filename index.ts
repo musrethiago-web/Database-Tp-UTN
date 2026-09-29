@@ -86,6 +86,25 @@ async function main() {
                 break;
             }
 
+            case 'delete': {
+                const [_, idStr] = args;
+
+                if (!idStr) {
+                    console.log('Error: Falta el ID. Uso: npx tsx index.ts delete <ID>');
+                    break;
+                }
+
+                const id = new ObjectId(idStr);
+
+                const resultado = await coleccion.deleteOne({ _id: id });
+
+                if (resultado.deletedCount === 1) {
+                    console.log(`El libro con ID ${idStr} fue eliminado exitosamente.`);
+                } else {
+                    console.log('No se encontró ningún libro con ese ID para eliminar.');
+                }
+                break;
+            }
 
             default:
                 console.log('Comando no reconocido. Opciones válidas: create, read, update, delete.');
