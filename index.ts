@@ -16,7 +16,6 @@ const collectionName = 'libros';
 
 
 async function main() {
-
     const args = process.argv.slice(2);
     const accion = args[0];
 
@@ -45,13 +44,48 @@ async function main() {
                 console.log(`Libro guardado con éxito. ID: ${resultado.insertedId}`);
                 break;
             }
-            case 'read': {
 
+            case 'read': {
                 const libros = await coleccion.find({}).toArray();
                 console.log('\n--- Lista de Libros en la Biblioteca ---');
                 console.table(libros);
                 break;
             }
+
+            case 'update': {
+                const [_, idStr, titulo, autor, precioStr, stockStr] = args;
+
+                if (!idStr || !titulo || !autor || !precioStr || !stockStr) {
+                    console.log('Error: Faltan argumentos. Uso: npx tsx index.ts update <ID> <titulo> <autor> <precio> <stock>');
+                    break;
+                }
+
+                const id = new ObjectId(idStr);
+
+                const actualizacion = {
+                    $set: {
+                        titulo,
+                        autor,
+                        precio: Number(precioStr),
+                        stock: Number(stockStr)
+                    }
+                };
+
+                const resultado = await coleccion.findOneAndUpdate(
+                    { _id: id },
+                    actualizacion,
+                    { returnDocument: 'after' }
+                );
+
+                if (resultado) {
+                    console.log('Libro actualizado exitosamente:');
+                    console.log(resultado);
+                } else {
+                    console.log('No se encontró ningún libro con ese ID.');
+                }
+                break;
+            }
+
 
             default:
                 console.log('Comando no reconocido. Opciones válidas: create, read, update, delete.');
